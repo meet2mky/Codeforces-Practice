@@ -91,9 +91,9 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-
 void solve()
 {
+   
 }
 
 signed main()
@@ -105,6 +105,7 @@ signed main()
 #endif
     int t = 1;
     //cin >> t;
+    srand(time(NULL));
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE

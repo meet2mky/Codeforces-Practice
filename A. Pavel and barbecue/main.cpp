@@ -94,6 +94,47 @@ LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vi p(n + 1, 0);
+    rep(i, 1, n + 1)
+    {
+        cin >> p[i];
+    }
+    int cnt = 0;
+    vi b(n);
+    for (auto &bb : b)
+    {
+        cin >> bb;
+        cnt += (bb);
+    }
+    // cycles
+    vb vis(n + 1, false);
+    int cycs = 0;
+    rep(i, 1, n + 1)
+    {
+        if (!vis[i])
+        {
+            vis[i] = true;
+            int now = i;
+            cycs += 1;
+            while (!vis[p[now]])
+            {
+                vis[p[now]] = true;
+                now = p[now];
+            }
+        }
+    }
+    if (odd(cnt))
+    {
+        cnt = 0;
+    }
+    else
+    {
+        cnt = 1;
+    }
+    cnt += (cycs == 1) ? 0 : cycs;
+    cout << cnt;
 }
 
 signed main()

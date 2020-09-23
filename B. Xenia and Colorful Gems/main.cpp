@@ -45,12 +45,13 @@ using namespace std;
 #define ll long long
 #define ld long double
 #define SZ(z) (int)(z).size()
+#define SQ(z) ((z) * (z))
 #define inf 0x3f3f3f3f
 #define linf 0x3f3f3f3f3f3f3f3f
 #define eps 0.0000001 // eps = 1e-7
 #define PI 3.141592653589793238
 
-//#define int long long
+#define int long long
 const int MOD = 1000000007;
 
 //variadic functions
@@ -94,6 +95,92 @@ LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 
 void solve()
 {
+    int r, g, b, pos;
+    cin >> r >> g >> b;
+    vector<pair<int, char>> vec(r + g + b);
+    rep(i, 0, r)
+    {
+        cin >> pos;
+        vec[i] = {pos, 'r'};
+    }
+    rep(i, 0, g)
+    {
+        cin >> pos;
+        vec[i + r] = {pos, 'g'};
+    }
+    rep(i, 0, b)
+    {
+        cin >> pos;
+        vec[i + r + g] = {pos, 'b'};
+    }
+    sort(all(vec));
+    int pr = 0;
+    int pg = 0;
+    int pb = 0;
+    int dpleft[3][r + g + b];
+    int dpright[3][r + g + b];
+    memset(dpleft, 0, sizeof dpleft);
+    memset(dpright, 0, sizeof dpright);
+    map<char, int> mp;
+    mp['r'] = 0;
+    mp['g'] = 1;
+    mp['b'] = 2;
+    dpleft[mp[vec[0].second]][0] = vec[0].first;
+    rep(i, 1, r + g + b)
+    {
+        dpleft[mp[vec[i].second]][i] = vec[i].first;
+        rep(j, 0, 3)
+        {
+            if (j == mp[vec[i].second])
+                continue;
+            dpleft[j][i] = dpleft[j][i - 1];
+        }
+    }
+    dpright[mp[vec[r + g + b - 1].second]][r + g + b - 1] = vec[r + g + b - 1].first;
+    repinv(i, r + g + b - 2, -1)
+    {
+        dpright[mp[vec[i].second]][i] = vec[i].first;
+        rep(j, 0, 3)
+        {
+            if (j == mp[vec[i].second])
+                continue;
+            dpright[j][i] = dpright[j][i + 1];
+        }
+    }
+    int minans = linf;
+
+    rep(i, 1, r + g + b - 1)
+    {
+        int a, b;
+        if (vec[i].second == 'r')
+        {
+            a = 1, b = 2;
+        }
+        if (vec[i].second == 'g')
+        {
+            a = 0, b = 2;
+        }
+        if (vec[i].second == 'b')
+        {
+            a = 0, b = 1;
+        }
+        int mid = vec[i].first;
+        int left = dpleft[a][i - 1];
+        int right = dpright[b][i + 1];
+        if (left != 0 && right != 0)
+        {
+            minans = min(minans, SQ(mid - left) + SQ(right - mid) + SQ(right - left));
+        }
+        swap(a, b);
+        mid = vec[i].first;
+        left = dpleft[a][i - 1];
+        right = dpright[b][i + 1];
+        if (left != 0 && right != 0)
+        {
+            minans = min(minans, SQ(mid - left) + SQ(right - mid) + SQ(right - left));
+        }
+    }
+    cout << minans << endl;
 }
 
 signed main()
@@ -104,7 +191,7 @@ signed main()
     freopen("output.txt", "w", stdout);
 #endif
     int t = 1;
-    //cin >> t;
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE

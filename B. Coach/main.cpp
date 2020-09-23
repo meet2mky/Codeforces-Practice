@@ -91,9 +91,96 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-
+vi g[50];
+vi deg(50, 0);
+vb vis(50, false);
+vi ans;
+vi solo;
+bool pos = true;
+int dfs(int now, int p)
+{
+    int pushed = 1;
+    ans.push_back(now);
+    vis[now] = true;
+    for (auto to : g[now])
+    {
+        if (to == p)
+            continue;
+        if (!vis[to])
+        {
+            pushed += dfs(to, now);
+        }
+    }
+    return pushed;
+}
 void solve()
 {
+    int n, m;
+    cin >> n >> m;
+    rep(i, 0, m)
+    {
+        int a, b;
+        cin >> a >> b;
+        g[a].push_back(b);
+        g[b].push_back(a);
+        deg[a]++;
+        deg[b]++;
+    }
+    rep(i, 1, n + 1)
+    {
+        if (deg[i] == 0)
+            solo.push_back(i);
+    }
+    rep(i, 1, n + 1)
+    {
+        if (!vis[i])
+        {
+            int pushed = dfs(i, -1);
+            if (pushed == 1)
+            {
+                ans.pop_back();
+            }
+            else
+            {
+                if (pushed > 3)
+                {
+                    pos = false;
+                    break;
+                }
+                else
+                {
+                    int need = 3 - pushed;
+                    if (need > SZ(solo))
+                    {
+                        pos = false;
+                        break;
+                    }
+                    while (need--)
+                    {
+                        ans.push_back(solo.back());
+                        solo.pop_back();
+                    }
+                }
+            }
+        }
+    }
+
+    if (!pos)
+    {
+        cout << "-1";
+    }
+    else
+    {
+        while (SZ(solo) > 0)
+        {
+            ans.push_back(solo.back());
+            solo.pop_back();
+        }
+        for (int i = 0; i < n; i += 3)
+        {
+            cout << ans[i] << " " << ans[i + 1] << " " << ans[i + 2] << "\n";
+        }
+    }
 }
 
 signed main()

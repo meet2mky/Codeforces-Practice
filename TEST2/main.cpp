@@ -91,9 +91,64 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-
+int canbuy(int nowp, vi &dp, int R)
+{
+    int l = 0;
+    int r = R;
+    if (nowp >= dp[R])
+        return R;
+    // always buy l and can not buy R
+    while (r - l > 1)
+    {
+        int m = (r + l) / 2;
+        if (dp[m] <= nowp)
+        {
+            l = m;
+        }
+        else
+        {
+            r = m;
+        }
+    }
+    return l;
+}
 void solve()
 {
+    int n, p, k;
+    cin >> n >> p >> k;
+    vi a(n);
+    for (auto &aa : a)
+    {
+        cin >> aa;
+    }
+    sort(all(a));
+    vi dp(k, 0);
+    for (int i = 0; i <= k - 2; i++)
+    {
+        dp[i + 1] = a[i];
+        dp[i + 1] += dp[i];
+    }
+    int ans = 0;
+    for (int i = k - 1; i <= 2 * k - 2; i++)
+    {
+        int nowp = p;
+        int nowans = 0;
+        for (int j = i; j < n; j += k)
+        {
+            if (a[j] <= nowp)
+            {
+                nowp -= a[j];
+                nowans += k;
+            }
+            else
+            {
+                break;
+            }
+        }
+        nowans += canbuy(nowp, dp, i - (k - 1));
+        ans = max(ans, nowans);
+    }
+    cout << ans << endl;
 }
 
 signed main()
@@ -104,7 +159,7 @@ signed main()
     freopen("output.txt", "w", stdout);
 #endif
     int t = 1;
-    //cin >> t;
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE

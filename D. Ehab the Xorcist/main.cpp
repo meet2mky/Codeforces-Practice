@@ -50,7 +50,7 @@ using namespace std;
 #define eps 0.0000001 // eps = 1e-7
 #define PI 3.141592653589793238
 
-//#define int long long
+#define int long long
 const int MOD = 1000000007;
 
 //variadic functions
@@ -94,6 +94,55 @@ LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 
 void solve()
 {
+    int xr, sm;
+    cin >> xr >> sm;
+    if (xr == 0 && sm == 0)
+    {
+        cout << "0\n";
+        return;
+    }
+    if (xr == 0)
+    {
+        if (odd(sm))
+        {
+            cout << "-1";
+        }
+        else
+        {
+            cout << "2\n"
+                 << sm / 2 << " " << sm / 2 << endl;
+        }
+        return;
+    }
+    if (sm < xr)
+    {
+        cout << "-1";
+        return;
+    }
+    if (sm == xr)
+    {
+        cout << "1\n"
+             << sm;
+        return;
+    }
+    if (odd(sm - xr))
+    {
+        cout << "-1";
+    }
+    else
+    {
+        int a = xr, b = (sm - xr) / 2, c = (sm - xr) / 2;
+        if (((a + b) ^ b) == xr)
+        {
+            cout << "2\n"
+                 << a + b << " " << b;
+        }
+        else
+        {
+            cout << "3\n"
+                 << a << " " << b << " " << b;
+        }
+    }
 }
 
 signed main()

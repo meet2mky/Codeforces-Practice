@@ -91,9 +91,37 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-
+ld powd(ld a, int e)
+{
+    ld res = 1.0;
+    while (e > 0)
+    {
+        if (e & 1)
+        {
+            res = res * a;
+        }
+        a = a * a;
+        e /= 2;
+    }
+    return res;
+}
+ld pro(int i, int n, int m)
+{
+    ld id = i;
+    ld md = m;
+    return powd(id / md, n) - powd((id - 1.0) / md, n);
+}
 void solve()
 {
+    ld ans = 0;
+    int m, n;
+    cin >> m >> n;
+    rep(i, 1, m + 1)
+    {
+        ld con = i;
+        ans += (con * pro(i, n, m));
+    }
+    cout << fixed << sp(6) << ans;
 }
 
 signed main()
