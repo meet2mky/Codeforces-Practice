@@ -91,41 +91,63 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+vvi cnt(201);
+int cnthere(int l, int r, int a)
+{
+    return cnt[a][r] - cnt[a][l - 1];
+};
 void solve()
 {
-    ld p;
-    int n, t;
-    cin >> n >> p >> t;
-    vector<vector<ld>> dp(n + 1, vector<ld>(t + 1, 0.0));
-    dp[0][0] = 1.0;
-    rep(time, 1, t + 1)
+    int n;
+    cin >> n;
+    int a[n + 1];
+    vi idx[201];
+    rep(i, 0, n)
     {
-        if (time <= n)
+        cin >> a[i + 1];
+        idx[a[i + 1]].push_back(i + 1);
+    }
+
+    rep(i, 1, 201)
+    {
+        cnt[i].clear();
+        cnt[i].resize(n + 1);
+    }
+    rep(aa, 1, 201)
+    {
+        rep(idx, 1, n + 1)
         {
-            rep(people, 0, time)
-            {
-                dp[people + 1][time] += p * dp[people][time - 1];
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-            }
-        }
-        else
-        {
-            dp[n][time] += dp[n][time - 1];
-            rep(people, 0, n)
-            {
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-                dp[people + 1][time] += p * dp[people][time - 1];
-            }
-          
+            cnt[aa][idx] += cnt[aa][idx - 1];
+            cnt[aa][idx] += (a[idx] == aa);
         }
     }
-    ld expans = 0.0;
-    rep(people, 0, min(n, t) + 1)
+
+    int ans = 0;
+    rep(i, 1, 201)
     {
-        expans += (ld)people * dp[people][t];
+        ans = max(ans, SZ(idx[i]));
     }
-    cout << fixed << sp(6) << expans;
+    rep(aa, 1, 201)
+    {
+        if (SZ(idx[aa]) == 0)
+            continue;
+        int l = 0;
+        int r = SZ(idx[aa]) - 1;
+        while (idx[aa][r] - idx[aa][l] > 1)
+        {
+            int midmax = 0;
+            rep(aaa, 1, 201)
+            {
+                midmax = max(midmax, cnthere(idx[aa][l] + 1, idx[aa][r] - 1, aaa));
+            }
+            ans = max(ans, 2 * (l + 1) + midmax);
+            l++;
+            r--;
+        }
+    }
+    cout << ans << endl;
 }
+
 signed main()
 {
     sync;
@@ -134,8 +156,7 @@ signed main()
     freopen("output.txt", "w", stdout);
 #endif
     int t = 1;
-    //cin >> t;
-    srand(time(NULL));
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE

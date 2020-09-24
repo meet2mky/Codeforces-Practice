@@ -91,41 +91,64 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+bool can(vvi &m)
+{
+    int row = SZ(m);
+    int col = SZ(m[0]);
+    rep(r, 0, row)
+    {
+        int wrongs = 0;
+        rep(c, 0, col)
+        {
+            if (m[r][c] != c + 1)
+            {
+                wrongs++;
+            }
+        }
+        if (wrongs > 2)
+            return false;
+    }
+    return true;
+}
 void solve()
 {
-    ld p;
-    int n, t;
-    cin >> n >> p >> t;
-    vector<vector<ld>> dp(n + 1, vector<ld>(t + 1, 0.0));
-    dp[0][0] = 1.0;
-    rep(time, 1, t + 1)
+    int row, col;
+    cin >> row >> col;
+    vvi m(row, vi(col, 0));
+    rep(i, 0, row)
     {
-        if (time <= n)
+        rep(j, 0, col)
         {
-            rep(people, 0, time)
-            {
-                dp[people + 1][time] += p * dp[people][time - 1];
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-            }
-        }
-        else
-        {
-            dp[n][time] += dp[n][time - 1];
-            rep(people, 0, n)
-            {
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-                dp[people + 1][time] += p * dp[people][time - 1];
-            }
-          
+            cin >> m[i][j];
         }
     }
-    ld expans = 0.0;
-    rep(people, 0, min(n, t) + 1)
+    bool pos = false;
+    pos |= can(m);
+    rep(col1, 0, col)
     {
-        expans += (ld)people * dp[people][t];
+        rep(col2, col1 + 1, col)
+        {
+            rep(r, 0, row)
+            {
+                swap(m[r][col1], m[r][col2]);
+            }
+            pos |= can(m);
+            rep(r, 0, row)
+            {
+                swap(m[r][col1], m[r][col2]);
+            }
+        }
     }
-    cout << fixed << sp(6) << expans;
+    if (pos)
+    {
+        cout << "YES\n";
+    }
+    else
+    {
+        cout << "NO\n";
+    }
 }
+
 signed main()
 {
     sync;
@@ -135,7 +158,6 @@ signed main()
 #endif
     int t = 1;
     //cin >> t;
-    srand(time(NULL));
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE

@@ -50,7 +50,7 @@ using namespace std;
 #define eps 0.0000001 // eps = 1e-7
 #define PI 3.141592653589793238
 
-//#define int long long
+#define int long long
 const int MOD = 1000000007;
 
 //variadic functions
@@ -91,41 +91,45 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    ld p;
-    int n, t;
-    cin >> n >> p >> t;
-    vector<vector<ld>> dp(n + 1, vector<ld>(t + 1, 0.0));
-    dp[0][0] = 1.0;
-    rep(time, 1, t + 1)
+    int n, rev, flip;
+    cin >> n >> rev >> flip;
+    string s;
+    int dp[n];
+    cin >> s;
+    rep(i, 0, n)
     {
-        if (time <= n)
+        dp[i] = (s[i] == '0');
+    }
+    rep(i, 1, n)
+    {
+        if (dp[i] && dp[i - 1])
         {
-            rep(people, 0, time)
-            {
-                dp[people + 1][time] += p * dp[people][time - 1];
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-            }
-        }
-        else
-        {
-            dp[n][time] += dp[n][time - 1];
-            rep(people, 0, n)
-            {
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-                dp[people + 1][time] += p * dp[people][time - 1];
-            }
-          
+            dp[i - 1] = 0;
         }
     }
-    ld expans = 0.0;
-    rep(people, 0, min(n, t) + 1)
+    int zseg = 0;
+    rep(i, 0, n)
     {
-        expans += (ld)people * dp[people][t];
+        zseg += dp[i];
     }
-    cout << fixed << sp(6) << expans;
+    if (zseg == 0)
+    {
+        cout << 0 << endl;
+    }
+    else if (zseg == 1)
+    {
+        cout << flip << endl;
+    }
+    else
+    {
+
+        cout << min(zseg * flip, (zseg - 1) * rev + flip) << endl;
+    }
 }
+
 signed main()
 {
     sync;
@@ -135,7 +139,6 @@ signed main()
 #endif
     int t = 1;
     //cin >> t;
-    srand(time(NULL));
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE

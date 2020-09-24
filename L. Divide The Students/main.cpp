@@ -91,41 +91,32 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    ld p;
-    int n, t;
-    cin >> n >> p >> t;
-    vector<vector<ld>> dp(n + 1, vector<ld>(t + 1, 0.0));
-    dp[0][0] = 1.0;
-    rep(time, 1, t + 1)
+    int a, b, c;
+    cin >> a >> b >> c;
+    if (a < c)
+        swap(a, c);
+    int g1 = a / 2;
+    int g2 = a - a / 2;
+    int g3 = c;
+    int z = max(g1, max(g2, g3));
+    int can = z - g1;
+    can += z - g2;
+    can += z - g3;
+    if (b <= can)
     {
-        if (time <= n)
-        {
-            rep(people, 0, time)
-            {
-                dp[people + 1][time] += p * dp[people][time - 1];
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-            }
-        }
-        else
-        {
-            dp[n][time] += dp[n][time - 1];
-            rep(people, 0, n)
-            {
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-                dp[people + 1][time] += p * dp[people][time - 1];
-            }
-          
-        }
+        cout << z << endl;
     }
-    ld expans = 0.0;
-    rep(people, 0, min(n, t) + 1)
+    else
     {
-        expans += (ld)people * dp[people][t];
+        b -= can;
+        z += (b / 3 + ((b % 3) != 0));
+        cout << z << endl;
     }
-    cout << fixed << sp(6) << expans;
 }
+
 signed main()
 {
     sync;
@@ -134,8 +125,7 @@ signed main()
     freopen("output.txt", "w", stdout);
 #endif
     int t = 1;
-    //cin >> t;
-    srand(time(NULL));
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE

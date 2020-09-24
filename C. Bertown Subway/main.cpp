@@ -50,7 +50,7 @@ using namespace std;
 #define eps 0.0000001 // eps = 1e-7
 #define PI 3.141592653589793238
 
-//#define int long long
+#define int long long
 const int MOD = 1000000007;
 
 //variadic functions
@@ -91,41 +91,77 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
+void dbgv(vi a)
+{
+    cout << "{";
+    for (auto x : a)
+    {
+        cout << x << ", ";
+    }
+    cout << "}\n";
+}
+//Debugger  <--------------------------------------------
+/*****************************************************************
+Read the problem carefully!!
+Take inputs carefully
+Care for array index out of bound errors
+Check for overflow
+Divide the problem in several parts if possible
+Keep Calm and believe on yourself.
+Do not panic & work hard you will get it right one day
+
+
+LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
+******************************************************************/
+
 void solve()
 {
-    ld p;
-    int n, t;
-    cin >> n >> p >> t;
-    vector<vector<ld>> dp(n + 1, vector<ld>(t + 1, 0.0));
-    dp[0][0] = 1.0;
-    rep(time, 1, t + 1)
+    vi ans;
+    int n;
+    cin >> n;
+    int next[n + 1];
+    rep(i, 0, n)
     {
-        if (time <= n)
+        cin >> next[i + 1];
+    }
+    vb vis(n + 1, false);
+    rep(i, 1, n + 1)
+    {
+        if (!vis[i])
         {
-            rep(people, 0, time)
+            int now = i;
+            vis[now] = true;
+            int cnt = 1;
+            while (!vis[next[now]])
             {
-                dp[people + 1][time] += p * dp[people][time - 1];
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
+                vis[next[now]] = true;
+                now = next[now];
+                cnt++;
             }
-        }
-        else
-        {
-            dp[n][time] += dp[n][time - 1];
-            rep(people, 0, n)
-            {
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-                dp[people + 1][time] += p * dp[people][time - 1];
-            }
-          
+            ans.push_back(cnt);
         }
     }
-    ld expans = 0.0;
-    rep(people, 0, min(n, t) + 1)
+    sort(all(ans));
+    if (SZ(ans) == 1)
     {
-        expans += (ld)people * dp[people][t];
+        cout << n * n << endl;
     }
-    cout << fixed << sp(6) << expans;
+    else
+    {
+        int con = ans.back();
+        ans.pop_back();
+        con += ans.back();
+        ans.pop_back();
+        con = (con * con);
+        for (auto x : ans)
+        {
+            con += x * x;
+        }
+        cout << con << endl;
+    }
 }
+
 signed main()
 {
     sync;
@@ -135,7 +171,6 @@ signed main()
 #endif
     int t = 1;
     //cin >> t;
-    srand(time(NULL));
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE

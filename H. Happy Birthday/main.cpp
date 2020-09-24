@@ -91,41 +91,51 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    ld p;
-    int n, t;
-    cin >> n >> p >> t;
-    vector<vector<ld>> dp(n + 1, vector<ld>(t + 1, 0.0));
-    dp[0][0] = 1.0;
-    rep(time, 1, t + 1)
+    int cnt[10];
+    int min = 0;
+    rep(i, 0, 10)
     {
-        if (time <= n)
+        cin >> cnt[i];
+        if (cnt[i] < cnt[min])
         {
-            rep(people, 0, time)
-            {
-                dp[people + 1][time] += p * dp[people][time - 1];
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-            }
-        }
-        else
-        {
-            dp[n][time] += dp[n][time - 1];
-            rep(people, 0, n)
-            {
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-                dp[people + 1][time] += p * dp[people][time - 1];
-            }
-          
+            min = i;
         }
     }
-    ld expans = 0.0;
-    rep(people, 0, min(n, t) + 1)
+    int value = 0;
+    while (cnt[value] != cnt[min])
     {
-        expans += (ld)people * dp[people][t];
+        value++;
     }
-    cout << fixed << sp(6) << expans;
+    if (value == 0)
+    {
+        string canbe = "10";
+        string zeros(cnt[value], '0');
+        canbe += zeros;
+        int everyoneneed = SZ(canbe) - 1;
+        rep(i, 1, 10)
+        {
+            if (cnt[i] < everyoneneed)
+            {
+                char dg = i + '0';
+                string betterans(everyoneneed, dg);
+                cout << betterans << endl;
+                return;
+            }
+        }
+        cout << canbe << endl;
+    }
+    else
+    {
+        char dg = value + '0';
+        string dgz(cnt[value] + 1, dg);
+        cout << dgz;
+    }
+    cout << endl;
 }
+
 signed main()
 {
     sync;
@@ -134,8 +144,7 @@ signed main()
     freopen("output.txt", "w", stdout);
 #endif
     int t = 1;
-    //cin >> t;
-    srand(time(NULL));
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE

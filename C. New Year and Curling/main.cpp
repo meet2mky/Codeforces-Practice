@@ -91,41 +91,42 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    ld p;
-    int n, t;
-    cin >> n >> p >> t;
-    vector<vector<ld>> dp(n + 1, vector<ld>(t + 1, 0.0));
-    dp[0][0] = 1.0;
-    rep(time, 1, t + 1)
+    int n, r;
+    cin >> n >> r;
+    int coox[n];
+    rep(i, 0, n)
     {
-        if (time <= n)
+        cin >> coox[i];
+    }
+    ld ansy[n];
+    ansy[0] = (ld)r;
+    rep(now, 1, n)
+    {
+        ld res = (ld)r;
+        rep(prev, 0, now)
         {
-            rep(people, 0, time)
+            // if touches
+            if (abs(coox[now] - coox[prev]) <= 2 * r)
             {
-                dp[people + 1][time] += p * dp[people][time - 1];
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
+                // touches sure
+                ld R = (ld)r;
+                ld yprev = ansy[prev];
+                ld diffx = 1.0 * abs(coox[now] - coox[prev]);
+                ld yinc = sqrt(4.0 * R * R - diffx * diffx);
+                res = max(res, yprev + yinc);
             }
         }
-        else
-        {
-            dp[n][time] += dp[n][time - 1];
-            rep(people, 0, n)
-            {
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-                dp[people + 1][time] += p * dp[people][time - 1];
-            }
-          
-        }
+        ansy[now] = res;
     }
-    ld expans = 0.0;
-    rep(people, 0, min(n, t) + 1)
+    rep(i, 0, n)
     {
-        expans += (ld)people * dp[people][t];
+        cout << fixed << sp(10) << ansy[i] << ' ';
     }
-    cout << fixed << sp(6) << expans;
 }
+
 signed main()
 {
     sync;
@@ -135,7 +136,6 @@ signed main()
 #endif
     int t = 1;
     //cin >> t;
-    srand(time(NULL));
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE

@@ -1,6 +1,6 @@
 /*****************************************************************
 IN GOD WE TRUST !!   
-
+ 
 Author:- meet2mky
 Date: -
 Problem:-
@@ -87,44 +87,39 @@ Check for overflow
 Divide the problem in several parts if possible
 Keep Calm and believe on yourself.
 Do not panic & work hard you will get it right one day
-
-
+ 
+ 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+int dp[1000001];
 void solve()
 {
-    ld p;
-    int n, t;
-    cin >> n >> p >> t;
-    vector<vector<ld>> dp(n + 1, vector<ld>(t + 1, 0.0));
-    dp[0][0] = 1.0;
-    rep(time, 1, t + 1)
+    int n, num;
+    cin >> n;
+    rep(i, 0, n)
     {
-        if (time <= n)
+        cin >> num;
+        dp[num] = 1;
+    }
+    rep(i, 1, 1000001)
+    {
+        if (dp[i])
         {
-            rep(people, 0, time)
+            for (int mult = i + i; mult < 1000001; mult += i)
             {
-                dp[people + 1][time] += p * dp[people][time - 1];
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
+                if (dp[mult])
+                {
+                    dp[mult] = max(dp[mult], 1 + dp[i]);
+                }
             }
         }
-        else
-        {
-            dp[n][time] += dp[n][time - 1];
-            rep(people, 0, n)
-            {
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-                dp[people + 1][time] += p * dp[people][time - 1];
-            }
-          
-        }
     }
-    ld expans = 0.0;
-    rep(people, 0, min(n, t) + 1)
+    int best = 0;
+    rep(i, 1, 1000001)
     {
-        expans += (ld)people * dp[people][t];
+        best = max(best, dp[i]);
     }
-    cout << fixed << sp(6) << expans;
+    cout << best << endl;
 }
 signed main()
 {
@@ -135,12 +130,12 @@ signed main()
 #endif
     int t = 1;
     //cin >> t;
-    srand(time(NULL));
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE
         error(testcase);
 #endif
+
         solve();
     }
     return 0;

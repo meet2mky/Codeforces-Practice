@@ -50,7 +50,7 @@ using namespace std;
 #define eps 0.0000001 // eps = 1e-7
 #define PI 3.141592653589793238
 
-//#define int long long
+#define int long long
 const int MOD = 1000000007;
 
 //variadic functions
@@ -91,41 +91,30 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    ld p;
-    int n, t;
-    cin >> n >> p >> t;
-    vector<vector<ld>> dp(n + 1, vector<ld>(t + 1, 0.0));
-    dp[0][0] = 1.0;
-    rep(time, 1, t + 1)
+    int n;
+    cin >> n;
+    vi a(n);
+    rep(i, 0, n)
     {
-        if (time <= n)
-        {
-            rep(people, 0, time)
-            {
-                dp[people + 1][time] += p * dp[people][time - 1];
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-            }
-        }
-        else
-        {
-            dp[n][time] += dp[n][time - 1];
-            rep(people, 0, n)
-            {
-                dp[people][time] += (1.0 - p) * dp[people][time - 1];
-                dp[people + 1][time] += p * dp[people][time - 1];
-            }
-          
-        }
+        cin >> a[i];
     }
-    ld expans = 0.0;
-    rep(people, 0, min(n, t) + 1)
+    unordered_map<int, int> mp;
+    int cnt = 0;
+    rep(i, 0, n)
     {
-        expans += (ld)people * dp[people][t];
+        rep(bit, 0, 33)
+        {
+            int need = (1LL << bit) - a[i];
+            cnt += mp[need];
+        }
+        mp[a[i]]++;
     }
-    cout << fixed << sp(6) << expans;
+    cout << cnt << endl;
 }
+
 signed main()
 {
     sync;
@@ -135,7 +124,6 @@ signed main()
 #endif
     int t = 1;
     //cin >> t;
-    srand(time(NULL));
     for (int testcase = 1; testcase <= t; testcase++)
     {
 #ifndef ONLINE_JUDGE
