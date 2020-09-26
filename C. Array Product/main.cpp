@@ -91,46 +91,60 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-void f(int n, char x)
-{
-    while (n-- > 0)
-    {
-        cout << x;
-    }
-}
+
 void solve()
 {
-    int n, k, a, b;
-    cin >> n >> k >> a >> b;
-    char fora = 'G', forb = 'B';
-    if (a < b)
+    int n;
+    cin >> n;
+    vi a(n);
+    int neg = 0;
+    rep(i, 0, n)
     {
-        swap(a, b);
-        swap(fora, forb);
+        cin >> a[i];
+        if (a[i] < 0)
+        {
+            neg++;
+        }
     }
-    int cnt = (a / k) + ((a % k) != 0);
-    if (b < (cnt - 1))
+    if (odd(neg))
     {
-        cout << "NO";
-        return;
+        int mx = -2e9;
+        int idx = -1;
+        rep(i, 0, n)
+        {
+            if (a[i] < 0 && a[i] > mx)
+            {
+                mx = a[i];
+                idx = i;
+            }
+        }
+        a[idx] = 0;
     }
-    b -= (cnt - 1);
-    int fp = min(a, k);
-    f(fp, fora);
-    a -= fp;
-    rep(i, 1, cnt)
+    vi z;
+    vi nonz;
+    rep(i, 0, n)
     {
-        int fpb = min(b, k - 1);
-        b -= fpb;
-        f(fpb + 1, forb);
-        int fpa = min(a, k);
-        a -= fpa;
-        f(fpa, fora);
+        if (a[i] == 0)
+        {
+            z.emplace_back(i + 1);
+        }
+        else
+        {
+            nonz.emplace_back(i + 1);
+        }
     }
-    if (b > 0)
+    if (SZ(z))
     {
-        assert(b <= k);
-        f(b, forb);
+        rep(i, 1, SZ(z))
+        {
+            cout << "1 " << z[i - 1] << " " << z[i] << endl;
+        }
+        if (SZ(nonz))
+            cout << "2 " << z[SZ(z) - 1] << endl;
+    }
+    rep(i, 1, SZ(nonz))
+    {
+        cout << "1 " << nonz[i - 1] << " " << nonz[i] << endl;
     }
 }
 
