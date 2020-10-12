@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,36 +138,48 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int n, sum = 0;
+    R(n);
+    VI ans(n);
+    REP(i, 0, n)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
-        {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
-            {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
-            }
-        }
-        else
-        {
-            W(a, b);
-        }
+        R(ans[i]);
+        sum += ans[i];
     }
-    cout << "0 0" << endl;
+    if (sum == 0)
+    {
+        W("NO");
+        return;
+    }
+    W("YES");
+    VI ans2 = ans;
+    SORT(ans);
+    SORT(ans2);
+    VI t1 = ans;
+    reverse(ALL(ans2));
+    VI t2 = ans2;
+    REP(i, 1, SZ(ans))
+    {
+        ans[i] += ans[i - 1];
+        ans2[i] += ans2[i - 1];
+    }
+    bool okans = true;
+    for (auto num : ans)
+    {
+        if (num == 0)
+            okans = false;
+    }
+    if (okans)
+    {
+        W(t1);
+    }
+    else
+    {
+        W(t2);
+    }
 }
 
 signed main()
@@ -181,7 +192,7 @@ signed main()
 #endif
 
     int t = 1;
-    //cin >> t;
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
         //cout << "Case " << testcase << ": ";

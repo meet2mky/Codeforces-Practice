@@ -18,7 +18,6 @@ Institue:- NITA
 #include <queue>
 #include <cmath>
 #include <cassert>
-#include <chrono>
 #include <cctype>
 #include <iomanip>
 #include <stack>
@@ -41,13 +40,8 @@ using namespace std;
 #define CUBE(x) ((x) * (x) * (x))
 #define ODD(x) (x & 1)
 #define EVEN(x) (!(x & 1))
-#define MEMS0(x) memset((x), 0, sizeof(x))
-#define MEMS1(x) memset((x), 1, sizeof(x))
-#define MEMSM1(x) memset((x), -1, sizeof(x))
-#define PB emplace_back
-#define MP make_pair
+#define PB push_back
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -123,7 +117,7 @@ void W(const T &head, const U &... tail)
 #define DEBUG(...)
 #endif
 
-//#define NEEDLONG
+#define NEEDLONG
 #ifdef NEEDLONG
 #define int long long
 #endif
@@ -139,59 +133,123 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-void solve()
+
+struct T
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int x, y, idx;
+};
+int cost(const T &a, const T &b, bool flag)
+{
+    if (flag)
+        return min(abs(a.x - b.x), abs(a.y - b.y));
+    return abs(a.x - b.x) + abs(a.y - b.y);
+}
+bool compx(const T &a, const T &b)
+{
+    return a.x < b.x;
+}
+bool compy(const T &a, const T &b)
+{
+    return a.y < b.y;
+}
+int dijkstra(VPII g[], int m, T src, T dest)
+{
+    VI dist(m + 2, LINF);
+    VB vis(m + 2, false);
+    VI p(m + 2, -1);
+    dist[src.idx] = 0;
+    priority_queue<pair<int, int>> pq;
+    pq.push({0, src.idx});
+    while (!pq.empty())
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        int u = pq.top().second;
+        pq.pop();
+        if (vis[u])
+            continue;
+        vis[u] = true;
+        for (auto nx : g[u])
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
+            int v = nx.first;
+            int ew = nx.second;
+            if (dist[v] > dist[u] + ew)
             {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
+                dist[v] = dist[u] + ew;
+                pq.push({-dist[v], v});
             }
         }
-        else
-        {
-            W(a, b);
-        }
     }
-    cout << "0 0" << endl;
+    return dist[dest.idx];
 }
-
+void solve()
+{
+    int n, m;
+    R(n, m);
+    int sx, sy, fx, fy;
+    R(sx, sy, fx, fy);
+    vector<T> pts(m);
+    REP(i, 0, m)
+    {
+        R(pts[i].x, pts[i].y);
+        pts[i].idx = i;
+    }
+    VPII g[m + 2];
+    sort(ALL(pts), compx);
+    REP(i, 0, m - 1)
+    {
+        int u = pts[i].idx;
+        int v = pts[i + 1].idx;
+        int dist = cost(pts[i], pts[i + 1], 1);
+        g[u].push_back({v, dist});
+        g[v].push_back({u, dist});
+    }
+    sort(ALL(pts), compy);
+    REP(i, 0, m - 1)
+    {
+        int u = pts[i].idx;
+        int v = pts[i + 1].idx;
+        int dist = cost(pts[i], pts[i + 1], 1);
+        g[u].push_back({v, dist});
+        g[v].push_back({u, dist});
+    }
+    T src, dest;
+    src.x = sx, src.y = sy, src.idx = m;
+    dest.x = fx, dest.y = fy, dest.idx = m + 1;
+    REP(i, 0, m)
+    {
+        int u = pts[i].idx;
+        int v = src.idx;
+        int dist = cost(pts[i], src, 1);
+        g[u].push_back({v, dist});
+        g[v].push_back({u, dist});
+    }
+    REP(i, 0, m)
+    {
+        int u = pts[i].idx;
+        int v = dest.idx;
+        int dist = cost(pts[i], dest, 0);
+        g[u].push_back({v, dist});
+        g[v].push_back({u, dist});
+    }
+    int u = src.idx;
+    int v = dest.idx;
+    int dist = cost(src, dest, 0);
+    g[u].push_back({v, dist});
+    g[v].push_back({u, dist});
+    int ans = dijkstra(g, m, src, dest);
+    W(ans);
+}
 signed main()
 {
     sync;
 #ifndef ONLINE_JUDGE
-    auto begin = std::chrono::high_resolution_clock::now();
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
 #endif
-
     int t = 1;
     //cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
-        //cout << "Case " << testcase << ": ";
         solve();
     }
-
-#ifndef ONLINE_JUDGE
-    auto end = std::chrono::high_resolution_clock::now();
-    cout << setprecision(4) << fixed;
-    cerr << "Execution time: " << std::chrono::duration_cast<std::chrono::duration<double>>(end - begin).count() << " seconds" << endl;
-#endif
     return 0;
 }

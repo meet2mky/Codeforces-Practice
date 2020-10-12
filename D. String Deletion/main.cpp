@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,38 +138,88 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int n;
+    R(n);
+    string s;
+    cin >> s;
+    stack<pair<int, int>> S;
+    VI dp(n, 1);
+    REPR(i, n - 2, -1)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        if (s[i] == s[i + 1])
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
-            {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
-            }
-        }
-        else
-        {
-            W(a, b);
+            dp[i] += dp[i + 1];
+            dp[i + 1] = 0;
         }
     }
-    cout << "0 0" << endl;
+    REPR(i, n - 1, -1)
+    {
+        if (dp[i] > 2)
+        {
+            S.push({i, dp[i] - 2});
+        }
+    }
+    SETALL(dp, 1);
+    REP(i, 1, n)
+    {
+        if (s[i] == s[i - 1])
+        {
+            dp[i] += dp[i - 1];
+            dp[i - 1] = 0;
+        }
+    }
+    int cnt = 0;
+    REP(i, 0, n)
+    {
+     //   cout << "AT I: " << i << endl;
+        while (!S.empty() && S.top().first < i)
+        {
+            S.pop();
+        }
+        if (dp[i] >= 2)
+        {
+           // cout << "Inc + 1\n";
+            dp[i] = 0;
+            cnt++;
+        }
+        if (dp[i] == 1)
+        {
+          //  cout << "Single\n";
+            if (!S.empty())
+            {
+              //  cout << "Supported\n";
+                auto pt = S.top();
+                S.pop();
+                pt.second--;
+                if (pt.second)
+                {
+                    S.push(pt);
+                }
+            }
+            else
+            {
+               // cout << "no support\n";
+                dp[i] = 0;
+                REP(j, i + 1, n)
+                {
+                    if (dp[j])
+                    {
+                        if (dp[j] >= 2)
+                            dp[j] = 1;
+                        else
+                            dp[j] = 0;
+                        break;
+                    }
+                }
+            }
+            cnt++;
+        }
+    }
+    W(cnt);
 }
-
 signed main()
 {
     sync;
@@ -181,7 +230,7 @@ signed main()
 #endif
 
     int t = 1;
-    //cin >> t;
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
         //cout << "Case " << testcase << ": ";

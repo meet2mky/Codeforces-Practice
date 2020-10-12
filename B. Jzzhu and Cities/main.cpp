@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -123,7 +122,7 @@ void W(const T &head, const U &... tail)
 #define DEBUG(...)
 #endif
 
-//#define NEEDLONG
+#define NEEDLONG
 #ifdef NEEDLONG
 #define int long long
 #endif
@@ -139,36 +138,92 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-void solve()
+const int N = 1e5 + 10;
+struct Type
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int to;
+    int cost;
+    int type;
+    int en;
+    Type(int to_ = -1, int cost_ = INF, int type_ = 3, int en_ = -1) : to(to_), cost(cost_), type(type_), en(en_)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+    }
+};
+vector<Type> g[N];
+int n, m, k;
+VB used;
+struct cmp
+{
+    bool operator()(const pair<PII, PII> &a, const pair<PII, PII> &b)
+    {
+        if (a.F.F != b.F.F)
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
+            return a.F.F > b.F.F;
+        }
+        return a.F.S > b.F.S;
+    }
+};
+void dik(int s)
+{
+    VI d(n + 1, LINF);
+    VB marked(n + 1, false);
+    priority_queue<pair<PII, PII>, vector<pair<PII, PII>>, cmp> pq;
+    marked[1] = true;
+    d[1] = 0;
+    for (auto nx : g[1])
+    {
+        d[nx.to] = nx.cost;
+        pq.push({{nx.cost, nx.type}, {nx.to, nx.en}});
+    }
+    while (!pq.empty())
+    {
+        int to = pq.top().S.F;
+        int en = pq.top().S.S;
+        int wto = pq.top().S.S;
+        pq.pop();
+        if (marked[to])
+            continue;
+        marked[to] = true;
+        used[en] = true;
+        for (auto nx : g[to])
+        {
+            if (d[nx.to] > wto + nx.cost)
             {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
+                d[nx.to] = wto + nx.cost;
+                pq.push({{d[nx.cost], nx.cost}, {nx.to, nx.en}});
             }
         }
-        else
+    }
+}
+
+void solve()
+{
+    R(n, m, k);
+    used.resize(m + k);
+    SETALL(used, false);
+    REP(i, 0, m)
+    {
+        int u, v, d;
+        g[u].PB(Type(v, d, 1, 0));
+        g[v].PB(Type(u, d, 1, 0));
+    }
+    REP(i, 0, k)
+    {
+        int s, d;
+        R(s, d);
+        g[1].PB(Type(s, d, 0, m + i));
+        g[s].PB(Type(1, d, 0, m + i));
+    }
+    dik(1);
+    int res = 0;
+    REP(i, 0, k)
+    {
+        if (!used[m + i])
         {
-            W(a, b);
+            res++;
         }
     }
-    cout << "0 0" << endl;
+    W(res);
 }
 
 signed main()

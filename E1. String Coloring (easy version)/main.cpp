@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,36 +138,68 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-void solve()
+bool dfs(int node, VI g[], string &color)
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    for (auto next : g[node])
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        if (color[next] == 'N')
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
+            color[next] = color[node] ^ '1' ^ '0';
+            if (dfs(next, g, color) == false)
             {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
+                return false;
             }
         }
         else
         {
-            W(a, b);
+            if (color[node] == color[next])
+                return false;
         }
     }
-    cout << "0 0" << endl;
+    return true;
+}
+bool bipartite(VI g[], string &color)
+{
+    int n = SZ(color);
+    bool ans = true;
+    REP(i, 0, n)
+    {
+        if (color[i] == 'N')
+        {
+            color[i] = '0';
+            ans &= dfs(i, g, color);
+        }
+    }
+    return ans;
+}
+void solve()
+{
+    int n;
+    R(n);
+    string s;
+    cin >> s;
+    VI g[n];
+    REP(i, 1, n)
+    {
+        REP(j, 0, i)
+        {
+            if (s[j] > s[i])
+            {
+                g[i].push_back(j);
+                g[j].push_back(i);
+            }
+        }
+    }
+    string color(n, 'N');
+    if (bipartite(g, color))
+    {
+        W("YES");
+        W(color);
+    }
+    else
+    {
+        W("NO");
+    }
 }
 
 signed main()

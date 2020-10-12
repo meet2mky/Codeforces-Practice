@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -141,34 +140,33 @@ LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int n;
+    R(n);
+    VI nums;
+    REP(i, 1, n + 1)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        nums.push_back(i);
+    }
+    cout << "2\n";
+    while (SZ(nums) > 2)
+    {
+        int n = SZ(nums);
+        if (nums[n - 1] % 2 == nums[n - 2] % 2)
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
-            {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
-            }
+            cout << nums[n - 1] << ' ' << nums[n - 2] << endl;
+            int na = (nums[n - 1] + nums[n - 2]) / 2;
+            nums.pop_back();
+            nums.pop_back();
+            nums.push_back(na);
         }
         else
         {
-            W(a, b);
+            cout << nums[n - 3] << ' ' << nums[n - 1] << endl;
+            nums[n - 3]++;
+            nums.pop_back();
         }
     }
-    cout << "0 0" << endl;
+    cout << nums[0] << ' ' << nums[1] << endl;
 }
 
 signed main()
@@ -181,7 +179,7 @@ signed main()
 #endif
 
     int t = 1;
-    //cin >> t;
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
         //cout << "Case " << testcase << ": ";

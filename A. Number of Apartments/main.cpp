@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,36 +138,39 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    unordered_map<int, vector<int>> mp;
+    REP(x, 0, 100)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        REP(y, 0, 100)
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
+            REP(z, 0, 100)
             {
-                if (reach[x][a])
+                int t = 3 * x + 5 * y + 7 * z;
+                if (t <= 1000 && mp.find(t) == mp.end())
                 {
-                    reach[x] |= reach[a];
+                    mp[t] = vector<int>{x, y, z};
                 }
             }
         }
+    }
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n;
+        cin >> n;
+        if (mp.find(n) == mp.end())
+        {
+            W("-1");
+        }
         else
         {
-            W(a, b);
+            W(mp[n]);
         }
     }
-    cout << "0 0" << endl;
 }
 
 signed main()

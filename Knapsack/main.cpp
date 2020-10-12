@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,36 +138,26 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+#define ll long long
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    ll n, m;
+    cin >> n >> m;
+    vector<ll> w(n), v(n);
+    for (ll i = 0; i < n; ++i)
+        cin >> w[i] >> v[i];
+    vector<vector<ll>> dp(n + 1, vector<ll>(m + 1, 0));
+    for (ll i = 1; i <= n; ++i)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        for (ll j = 1; j <= m; ++j)
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
-            {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
-            }
-        }
-        else
-        {
-            W(a, b);
+            if (w[i - 1] > j)
+                dp[i][j] = dp[i - 1][j];
+            else
+                dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - w[i - 1]] + v[i - 1]);
         }
     }
-    cout << "0 0" << endl;
+    cout << dp[n][m];
 }
 
 signed main()

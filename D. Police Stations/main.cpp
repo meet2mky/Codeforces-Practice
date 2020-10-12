@@ -18,7 +18,6 @@ Institue:- NITA
 #include <queue>
 #include <cmath>
 #include <cassert>
-#include <chrono>
 #include <cctype>
 #include <iomanip>
 #include <stack>
@@ -41,13 +40,8 @@ using namespace std;
 #define CUBE(x) ((x) * (x) * (x))
 #define ODD(x) (x & 1)
 #define EVEN(x) (!(x & 1))
-#define MEMS0(x) memset((x), 0, sizeof(x))
-#define MEMS1(x) memset((x), 1, sizeof(x))
-#define MEMSM1(x) memset((x), -1, sizeof(x))
-#define PB emplace_back
-#define MP make_pair
+#define PB push_back
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -141,57 +135,79 @@ LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int n, k, d;
+    R(n, k, d);
+    VPII g[n + 1];
+    VB used(n, false);
+    VI dist(n + 1);
+    VB vis(n + 1, false);
+    REP(i, 0, k)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        int ps;
+        R(ps);
+        vis[ps] = true;
+        dist[ps] = 0;
+    }
+    REP(i, 1, n)
+    {
+        int u, v;
+        R(u, v);
+        g[u].push_back({v, i});
+        g[v].push_back({u, i});
+    }
+    queue<int> q;
+    REP(i, 1, n + 1)
+    {
+        if (vis[i])
+            q.push(i);
+    }
+    while (!q.empty())
+    {
+        int u = q.front();
+        q.pop();
+        if (dist[u] >= d)
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
+            continue;
+        }
+        for (auto to : g[u])
+        {
+            if (!vis[to.first])
             {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
+                dist[to.first] = dist[u] + 1;
+                //
+                vis[to.first] = true;
+                q.push(to.first);
+                used[to.second] = true;
             }
         }
-        else
+    }
+    int cnt = 0;
+    REP(i, 1, n)
+    {
+        if (!used[i])
+            cnt++;
+    }
+    W(cnt);
+    REP(i, 1, n)
+    {
+        if (!used[i])
         {
-            W(a, b);
+            cout << i << ' ';
         }
     }
-    cout << "0 0" << endl;
 }
-
 signed main()
 {
     sync;
 #ifndef ONLINE_JUDGE
-    auto begin = std::chrono::high_resolution_clock::now();
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
 #endif
-
     int t = 1;
     //cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
-        //cout << "Case " << testcase << ": ";
         solve();
     }
-
-#ifndef ONLINE_JUDGE
-    auto end = std::chrono::high_resolution_clock::now();
-    cout << setprecision(4) << fixed;
-    cerr << "Execution time: " << std::chrono::duration_cast<std::chrono::duration<double>>(end - begin).count() << " seconds" << endl;
-#endif
     return 0;
 }

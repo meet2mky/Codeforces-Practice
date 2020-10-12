@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,36 +138,107 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int n, k;
+    R(n, k);
+    string s;
+    cin >> s;
+    // if all L & k > 0 make 1 W first at start reduce k by 1
+    int w = 0;
+    REP(i, 0, n)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        if (s[i] == 'W')
+            w++;
+    }
+    if (w == 0)
+    {
+        k = min(k, n);
+        W(max(0, 2 * k - 1));
+        return;
+    }
+    if (w == n)
+    {
+        W(2 * n - 1);
+        return;
+    }
+    k = min(k, n - w);
+    VI dp(n, 0);
+    REP(i, 0, n)
+    {
+        if (s[i] == 'L')
+            dp[i] = 1;
+    }
+    //  W(dp);
+    REP(i, 0, n)
+    {
+        if (dp[i] == 0)
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
+            REP(j, 0, i)
             {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
+                dp[j] = 0;
             }
-        }
-        else
-        {
-            W(a, b);
+            break;
         }
     }
-    cout << "0 0" << endl;
+    //  W(dp);
+    REPR(i, n - 1, -1)
+    {
+        if (dp[i] == 0)
+        {
+            REP(j, i, n)
+            {
+                dp[j] = 0;
+            }
+            break;
+        }
+    }
+    //   W(dp);
+    REP(i, 1, n)
+    {
+        if (dp[i])
+        {
+            dp[i] += dp[i - 1];
+            dp[i - 1] = 0;
+        }
+    }
+    VI seg;
+    REP(i, 0, n)
+    {
+        if (dp[i])
+        {
+            seg.push_back(dp[i]);
+        }
+    }
+    SORT(seg);
+    //  W("SEG: ", seg);
+    int initscore = (s[0] == 'W');
+    REP(i, 1, n)
+    {
+        if (s[i] == 'W')
+            if (s[i - 1] == 'W')
+            {
+                initscore += 2;
+            }
+            else
+            {
+                initscore += 1;
+            }
+    }
+  //  W("initscore: ", initscore);
+  //  W("k:", k);
+ //   W("seg: ", seg);
+    initscore += k * 2;
+    for (auto x : seg)
+    {
+        if (k >= x)
+        {
+            initscore += 1;
+            k -= x;
+        }
+    }
+    W(initscore);
 }
 
 signed main()
@@ -181,7 +251,7 @@ signed main()
 #endif
 
     int t = 1;
-    //cin >> t;
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
         //cout << "Case " << testcase << ": ";

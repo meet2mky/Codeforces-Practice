@@ -18,7 +18,6 @@ Institue:- NITA
 #include <queue>
 #include <cmath>
 #include <cassert>
-#include <chrono>
 #include <cctype>
 #include <iomanip>
 #include <stack>
@@ -41,13 +40,8 @@ using namespace std;
 #define CUBE(x) ((x) * (x) * (x))
 #define ODD(x) (x & 1)
 #define EVEN(x) (!(x & 1))
-#define MEMS0(x) memset((x), 0, sizeof(x))
-#define MEMS1(x) memset((x), 1, sizeof(x))
-#define MEMSM1(x) memset((x), -1, sizeof(x))
-#define PB emplace_back
-#define MP make_pair
+#define PB push_back
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,59 +133,148 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+struct HASH
+{
+    size_t operator()(const pair<int, int> &x) const
+    {
+        return hash<long long>()(((long long)x.first) ^ (((long long)x.second) << 32));
+    }
+};
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int n, m, k;
+    int N = 0;
+    R(n, m, k);
+    VI rows[n + 1];
+    VI cols[m + 1];
+    unordered_map<pair<int, int>, int, HASH> mp;
+    // row 1.....n
+    // col n + 1 ..... n + m
+    // points n + m + 1..... n + m + k..... n + m + k + 1 // if n,m not in k
+    int id = n + m + 1;
+    VPII pts(k);
+    REP(i, 0, k)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        int row, col;
+        R(row, col);
+        pts[i] = {row, col};
+        mp[{row, col}] = id++;
+        rows[row].push_back(col);
+        cols[col].push_back(row);
+    }
+    if (mp.find({n, m}) == mp.end())
+    {
+        mp[{n, m}] = id++;
+    }
+    int sn = mp[{1, 1}];
+    int fn = mp[{n, m}];
+    VPII g[id];
+    // we don't care if (n,m) is lit or not if
+    // we just connect this point to row node and col node with 1 cost
+    g[fn].push_back({n, 1});
+    g[n].push_back({fn, 1});
+    g[fn].push_back({n + m, 1});
+    g[n + m].push_back({fn, 1});
+    for (auto pt : pts)
+    {
+        int row = pt.first;
+        int col = pt.second;
+        int node1 = mp[{row, col}];
+        REP(i, -1, 2)
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
+            int r = row + i;
+            if (r >= 1 && r <= n)
             {
-                if (reach[x][a])
+                g[node1].push_back({r, 1});
+                g[r].push_back({node1, 1});
+            }
+        }
+        REP(i, -1, 2)
+        {
+            int c = col + i;
+            if (c >= 1 && c <= m)
+            {
+                c += n;
+                g[node1].push_back({c, 1});
+                g[c].push_back({node1, 1});
+            }
+        }
+    }
+    REP(row, 1, n + 1)
+    {
+        SORT(rows[row]);
+        REP(i, 1, SZ(rows[row]))
+        {
+            int colr = rows[row][i];
+            int coll = rows[row][i - 1];
+            if (coll + 1 == colr)
+            {
+                int a = mp[{row, coll}];
+                int b = mp[{row, colr}];
+                g[a].push_back({b, 0});
+                g[b].push_back({a, 0});
+            }
+        }
+    }
+    REP(col, 1, m + 1)
+    {
+        SORT(cols[col]);
+        REP(i, 1, SZ(cols[col]))
+        {
+            if (cols[col][i] == cols[col][i - 1] + 1)
+            {
+                int a = mp[{cols[col][i], col}];
+                int b = mp[{cols[col][i - 1], col}];
+                g[a].push_back({b, 0});
+                g[b].push_back({a, 0});
+            }
+        }
+    }
+    deque<pair<int, int>> q;
+    VB vis(id, false);
+    q.push_back({sn, 0});
+    vis[sn] = true;
+    int ans = -2;
+    while (!q.empty())
+    {
+        int u = q.front().first;
+        int w = q.front().second;
+        q.pop_front();
+        if (u == fn)
+        {
+            ans = w;
+            break;
+        }
+        for (auto to : g[u])
+        {
+            if (!vis[to.first])
+            {
+                vis[to.first] = true;
+                if (to.second == 0)
                 {
-                    reach[x] |= reach[a];
+                    q.push_front({to.first, w});
+                }
+                else
+                {
+                    q.push_back({to.first, w + to.second});
                 }
             }
         }
-        else
-        {
-            W(a, b);
-        }
     }
-    cout << "0 0" << endl;
+    W(ans / 2);
 }
-
 signed main()
 {
     sync;
 #ifndef ONLINE_JUDGE
-    auto begin = std::chrono::high_resolution_clock::now();
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
 #endif
-
     int t = 1;
     //cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
-        //cout << "Case " << testcase << ": ";
         solve();
     }
-
-#ifndef ONLINE_JUDGE
-    auto end = std::chrono::high_resolution_clock::now();
-    cout << setprecision(4) << fixed;
-    cerr << "Execution time: " << std::chrono::duration_cast<std::chrono::duration<double>>(end - begin).count() << " seconds" << endl;
-#endif
     return 0;
 }

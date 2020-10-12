@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,36 +138,135 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-void solve()
+vector<VPII> g;
+VPII ed;
+VB ori;
+VB bridge;
+int timer = 0;
+VI tin, low;
+VB vis;
+void dfs0(int s, int p = -1)
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    vis[s] = true;
+    tin[s] = low[s] = ++timer;
+    for (auto nx : g[s])
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        int to = nx.first;
+        if (to == p)
+            continue;
+        if (!vis[to])
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
+            dfs0(to, s);
+            low[s] = min(low[s], low[to]);
+            if (low[to] > tin[s])
             {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
+                bridge[nx.second] = true;
             }
         }
         else
         {
-            W(a, b);
+            low[s] = min(low[s], tin[to]);
         }
     }
-    cout << "0 0" << endl;
+}
+void mark_bridges(int n)
+{
+    tin.resize(n + 1);
+    low.resize(n + 1);
+    vis.resize(n + 1);
+    SETALL(vis, false);
+    dfs0(1);
+}
+int dfs1(int s, int p = -1)
+{
+    vis[s] = true;
+    int curr = 1;
+    for (auto nx : g[s])
+    {
+        int edi = nx.second;
+        int to = nx.first;
+        if (bridge[edi] || to == p || vis[to])
+        {
+            continue;
+        }
+        curr += dfs1(to, s);
+    }
+    return curr;
+}
+int dfs2(int s, int p = -1)
+{
+    vis[s] = true;
+    for (auto nx : g[s])
+    {
+        int edi = nx.second;
+        int to = nx.first;
+        if (to == p)
+            continue;
+        if (!vis[to])
+        {
+            ed[edi] = {s, to};
+            dfs2(to, s);
+            ori[edi] = true;
+        }
+        else
+        {
+            if (!ori[edi])
+            {
+                ed[edi] = {s, to};
+                ori[edi] = true;
+            }
+        }
+    }
+}
+void solve()
+{
+    int n, m;
+    R(n, m);
+    g.resize(n + 1);
+    ed.resize(m + 1);
+    ori.resize(m + 1);
+    bridge.resize(m + 1);
+    SETALL(bridge, false);
+    SETALL(ori, false);
+    REP(i, 1, m + 1)
+    {
+        int u, v;
+        cin >> u >> v;
+        ed[i] = {u, v};
+        g[u].push_back({v, i});
+        g[v].push_back({u, i});
+    }
+    mark_bridges(n);
+    // we can not travel bridges
+    SETALL(vis, false);
+    int ans = -1;
+    int root = -1;
+    REP(i, 1, n + 1)
+    {
+        if (!vis[i])
+        {
+            int curr = dfs1(i);
+            if (curr > ans)
+            {
+                ans = curr;
+                root = i;
+            }
+        }
+    }
+    SETALL(vis, false);
+    dfs2(root);
+    W(ans);
+    REP(i, 1, m + 1)
+    {
+        if (bridge[i])
+        {
+            swap(ed[i].first, ed[i].second);
+        }
+    }
+    REP(i, 1, m + 1)
+    {
+        W(ed[i]);
+    }
 }
 
 signed main()

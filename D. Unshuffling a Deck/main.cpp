@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,36 +138,101 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int n;
+    R(n);
+    VI a(n);
+    REP(i, 0, n)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        R(a[i]);
+    }
+    VVI moves;
+    while (1)
+    {
+        bool br = false;
+        bool done = true;
+        REPR(j, n - 1, -1)
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
+            REPR(i, j - 1, -1)
             {
-                if (reach[x][a])
+                if (a[j] + 1 == a[i])
                 {
-                    reach[x] |= reach[a];
+                   // W("aj: ", a[j], "ai: ", a[i]);
+                    VI na;
+                    VI mt;
+                    int cnt = 0;
+                    // [0,i] [i+1..j] 1,2 3 4 [j+1,n-1]
+                    // i --- j
+                    REP(x, j + 1, n)
+                    {
+                        na.PB(a[x]);
+                        cnt++;
+                    }
+
+                    if (cnt)
+                    {
+                        mt.PB(cnt);
+                    }
+                    int y = j;
+                    while (y > 0 && a[y] == 1 + a[y - 1])
+                    {
+                        y--;
+                    }
+                    cnt = 0;
+                    REP(x, y, j + 1)
+                    {
+                        na.PB(a[x]);
+                        cnt++;
+                    }
+                    if (cnt)
+                    {
+                        mt.PB(cnt);
+                    }
+                    cnt = 0;
+                    REP(x, i, y)
+                    {
+                        na.PB(a[x]);
+                        cnt++;
+                    }
+                    if (cnt)
+                    {
+                        mt.PB(cnt);
+                    }
+                    cnt = 0;
+                    REP(x, 0, i)
+                    {
+                        na.PB(a[x]);
+                        cnt++;
+                    }
+                    if (cnt)
+                    {
+                        mt.PB(cnt);
+                    }
+                    reverse(ALL(mt));
+                    moves.PB(mt);
+                    a = na;
+                  //  W(a);
+                    br = true;
+                    done = false;
+                    break;
                 }
             }
+            if (br)
+                break;
         }
-        else
+        if (done)
         {
-            W(a, b);
+            break;
         }
     }
-    cout << "0 0" << endl;
+    W(SZ(moves));
+    REP(i, 0, SZ(moves))
+    {
+        W(SZ(moves[i]), moves[i]);
+    }
+ //   W(a);
 }
 
 signed main()

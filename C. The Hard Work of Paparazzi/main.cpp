@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,36 +138,42 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int r, n;
+    R(r, n);
+    VI x(n);
+    VI y(n);
+    VI t(n);
+    VI dp(n);
+    REP(i, 0, n)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        R(t[i], x[i], y[i]);
+        if (t[i] >= abs(x[i] - 1) + abs(y[i] - 1))
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
-            {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
-            }
-        }
-        else
-        {
-            W(a, b);
+            dp[i] = 1;
         }
     }
-    cout << "0 0" << endl;
+    int limx = 4 * r;
+    REP(i, 1, n)
+    {
+        int j = i - 1;
+        for (int cnt = 0, j = i - 1; cnt < limx && j >= 0; cnt++, j--)
+        {
+            int dist = abs(x[i] - x[j]) + abs(y[i] - y[j]);
+            if (t[i] >= t[j] + dist && dp[j])
+            {
+                dp[i] = max(dp[i], 1 + dp[j]);
+            }
+        }
+    }
+    int mx = 0;
+    REP(i, 0, n)
+    {
+        mx = max(mx, dp[i]);
+    }
+    W(mx);
 }
 
 signed main()

@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -123,7 +122,7 @@ void W(const T &head, const U &... tail)
 #define DEBUG(...)
 #endif
 
-//#define NEEDLONG
+#define NEEDLONG
 #ifdef NEEDLONG
 #define int long long
 #endif
@@ -139,36 +138,184 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+template <typename T>
+T gcd(T a, T b)
+{
+    return a == 0 ? b : gcd(b % a, a);
+}
+template <typename T>
+T mulmod(T a, T b, T m)
+{
+    //assumed a and b in [0...(m-1)];
+    return (a * b) % m;
+}
+template <typename T>
+T addmod(T a, T b, T m)
+{
+    //assumed a and b in [0...(m-1)];
+    return a + b >= m ? a + b - m : a + b;
+}
+template <typename T>
+T submod(T a, T b, T m)
+{
+    //assumed a and b in [0...(m-1)];
+    return a - b < 0 ? a - b + m : a - b;
+}
+template <typename T>
+T powmod(T a, T e, T m)
+{
+    a %= m;
+    if (e == 0)
+        return 1;
+    T ans = a;
+    --e;
+    while (e)
+    {
+        if (e & 1)
+            ans = mulmod(a, ans, m);
+        a = mulmod(a, a, m);
+        e >>= 1;
+    }
+    return ans;
+}
+template <typename T>
+T invmod(T a, T m)
+{
+    // assuming m is prime and greater than 2
+    return powmod(a, m - 2, m);
+}
+
+template <typename T>
+vector<T> facarray(T N, T m)
+{
+    vector<T> f_(N + 1, 1);
+    for (T i = 2; i <= N; i++)
+        f_[i] = mulmod(i, f_[i - 1], m);
+    return f_;
+}
+template <typename T>
+vector<T> invarray(T N, T m)
+{
+    vector<T> inv_(N + 1, 1);
+    for (T i = 2; i <= N; i++)
+    {
+        inv_[i] = mulmod(m - m / i, inv_[m % i], m);
+    }
+    return inv_;
+}
+template <typename T>
+vector<T> invfacarray(T N, T m)
+{
+    // assuming m is prime, using fermat's little theorem
+    vector<T> f_ = facarray(N, m);
+    vector<T> invf_(N + 1);
+    invf_[N] = invmod(f_[N], m);
+    for (T i = N - 1; i >= 0; i--)
+    {
+        invf_[i] = mulmod(i + 1, invf_[i + 1], m);
+    }
+    return invf_;
+}
+vector<bool> sieve_(int N)
+{
+    vector<bool> p(N + 1, true);
+    p[0] = p[1] = false;
+    for (int i = 2; i * i <= N; i++)
+    {
+        if (p[i])
+        {
+            for (int j = i * i; j <= N; j += i)
+            {
+                p[j] = false;
+            }
+        }
+    }
+    return p;
+}
+vector<int> spf_(int N)
+{
+    vector<int> spf(N + 1, 1);
+    for (int i = 1; i <= N; i++)
+        spf[i] = i;
+    for (int i = 2; i * i <= N; i++)
+    {
+        if (spf[i] == i)
+        {
+            for (int j = i * i; j <= N; j += i)
+            {
+                spf[j] = i;
+            }
+        }
+    }
+    return spf;
+}
+vector<int> primelist_(int N)
+{
+    vector<bool> p_ = sieve_(N);
+    vector<int> p;
+    for (int i = 2; i <= N; i++)
+    {
+        if (p_[i])
+        {
+            p.push_back(i);
+        }
+    }
+    return p;
+}
+vector<pair<int, int>> prime_factorization_(int NUM, const vector<int> &spf_)
+{
+    vector<pair<int, int>> res;
+    if (NUM == 1)
+    {
+        return res; // no primes
+    }
+    while (NUM > 1)
+    {
+        int P_here = spf_[NUM];
+        int cnt = 0;
+        while (spf_[NUM] == P_here)
+        {
+            NUM /= P_here;
+            cnt++;
+        }
+        res.push_back({P_here, cnt});
+    }
+    return res;
+}
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int n;
+    R(n);
+    vector<char> code(n);
+    REP(i, 0, n)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        R(code[i]);
+    }
+    vector<int> dp(n, 0);
+    dp[0] = 1;
+    REP(i, 1, n)
+    {
+        if (code[i - 1] == 'f')
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
+            REPR(i, n - 1, 0)
             {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
+                dp[i] = dp[i - 1];
             }
+            dp[0] = 0;
         }
         else
         {
-            W(a, b);
+            REPR(i, n - 2, -1)
+            {
+                dp[i] = addmod(dp[i], dp[i + 1], 1LL * MOD);
+            }
         }
     }
-    cout << "0 0" << endl;
+    REP(i, 1, n)
+    {
+        dp[i] = addmod(dp[i], dp[i - 1], 1LL * MOD);
+    }
+    W(dp[n - 1]);
 }
 
 signed main()

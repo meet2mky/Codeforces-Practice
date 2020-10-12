@@ -18,7 +18,6 @@ Institue:- NITA
 #include <queue>
 #include <cmath>
 #include <cassert>
-#include <chrono>
 #include <cctype>
 #include <iomanip>
 #include <stack>
@@ -41,13 +40,8 @@ using namespace std;
 #define CUBE(x) ((x) * (x) * (x))
 #define ODD(x) (x & 1)
 #define EVEN(x) (!(x & 1))
-#define MEMS0(x) memset((x), 0, sizeof(x))
-#define MEMS1(x) memset((x), 1, sizeof(x))
-#define MEMSM1(x) memset((x), -1, sizeof(x))
-#define PB emplace_back
-#define MP make_pair
+#define PB push_back
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -139,47 +133,48 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+VI g[112345];
+VI a(112345);
+int n, m, ans;
+void dfs(int u, int cats, int p = -1)
+{
+    int childs = 0;
+    if (cats > m)
+        return;
+    for (auto to : g[u])
+    {
+        if (to == p)
+            continue;
+        dfs(to, cats * a[to] + a[to], u);
+        childs++;
+    }
+    if (childs == 0 && cats <= m)
+        ans++;
+}
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
-    {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
-        {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
-            {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
-            }
-        }
-        else
-        {
-            W(a, b);
-        }
-    }
-    cout << "0 0" << endl;
-}
+    R(n, m);
 
+    REP(i, 1, n + 1)
+    R(a[i]);
+
+    REP(i, 1, n)
+    {
+        int u, v;
+        cin >> u >> v;
+        g[u].push_back(v);
+        g[v].push_back(u);
+    }
+    dfs(1, a[1]);
+    W(ans);
+}
 signed main()
 {
     sync;
 #ifndef ONLINE_JUDGE
-    auto begin = std::chrono::high_resolution_clock::now();
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
 #endif
-
     int t = 1;
     //cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
@@ -187,11 +182,5 @@ signed main()
         //cout << "Case " << testcase << ": ";
         solve();
     }
-
-#ifndef ONLINE_JUDGE
-    auto end = std::chrono::high_resolution_clock::now();
-    cout << setprecision(4) << fixed;
-    cerr << "Execution time: " << std::chrono::duration_cast<std::chrono::duration<double>>(end - begin).count() << " seconds" << endl;
-#endif
     return 0;
 }

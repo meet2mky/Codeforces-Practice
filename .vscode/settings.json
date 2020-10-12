@@ -1,8 +1,10 @@
 {
     "files.associations": {
         "iostream": "cpp",
-        "*.tcc": "cpp"
-    },
-    "C_Cpp.errorSquiggles": "Enabled",
-    "C_Cpp.default.includePath": []
+        "cstdlib": "cpp",
+        "sstream": "cpp",
+        "regex": "cpp",
+        "chrono": "cpp",
+        "bitset": "cpp"
+    }
 }

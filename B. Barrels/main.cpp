@@ -47,7 +47,6 @@ using namespace std;
 #define PB emplace_back
 #define MP make_pair
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -123,7 +122,7 @@ void W(const T &head, const U &... tail)
 #define DEBUG(...)
 #endif
 
-//#define NEEDLONG
+#define NEEDLONG
 #ifdef NEEDLONG
 #define int long long
 #endif
@@ -139,36 +138,25 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    int n, k;
+    R(n, k);
+    vector<int> s(n);
+    REP(i, 0, n)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
-        {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
-            {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
-            }
-        }
-        else
-        {
-            W(a, b);
-        }
+        cin >> s[i];
     }
-    cout << "0 0" << endl;
+    SORT(s);
+    for (int i = n - 2; i >= 0 && k > 0; i--)
+    {
+        s[n - 1] += s[i];
+        s[i] = 0;
+        k--;
+    }
+    SORT(s);
+    W(s[n - 1] - s[0]);
 }
 
 signed main()
@@ -181,7 +169,7 @@ signed main()
 #endif
 
     int t = 1;
-    //cin >> t;
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
         //cout << "Case " << testcase << ": ";

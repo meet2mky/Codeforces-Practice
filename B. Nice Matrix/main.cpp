@@ -18,7 +18,6 @@ Institue:- NITA
 #include <queue>
 #include <cmath>
 #include <cassert>
-#include <chrono>
 #include <cctype>
 #include <iomanip>
 #include <stack>
@@ -41,13 +40,8 @@ using namespace std;
 #define CUBE(x) ((x) * (x) * (x))
 #define ODD(x) (x & 1)
 #define EVEN(x) (!(x & 1))
-#define MEMS0(x) memset((x), 0, sizeof(x))
-#define MEMS1(x) memset((x), 1, sizeof(x))
-#define MEMSM1(x) memset((x), -1, sizeof(x))
-#define PB emplace_back
-#define MP make_pair
+#define PB push_back
 #define F first
-//#define cout cerr
 #define S second
 #define VB vector<bool>
 #define VVB vector<VB>
@@ -123,7 +117,7 @@ void W(const T &head, const U &... tail)
 #define DEBUG(...)
 #endif
 
-//#define NEEDLONG
+#define NEEDLONG
 #ifdef NEEDLONG
 #define int long long
 #endif
@@ -139,59 +133,46 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
+int n, m;
+int M[105][105];
 void solve()
 {
-    int k;
-    R(k);
-    bitset<1001> reach[1001];
-    int m;
-    R(m);
-    VI ans[k + 1];
-    REP(i, 0, m)
+    R(n, m);
+    REP(i, 0, n)
     {
-        int a, b;
-        R(a, b);
-        if (reach[b][a] == false)
+        REP(j, 0, m)
         {
-            reach[a][b] = true;
-            reach[a] |= reach[b];
-            REP(x, 1, k + 1)
-            {
-                if (reach[x][a])
-                {
-                    reach[x] |= reach[a];
-                }
-            }
-        }
-        else
-        {
-            W(a, b);
+            R(M[i][j]);
         }
     }
-    cout << "0 0" << endl;
+    int res = 0;
+    REP(i, 0, n)
+    {
+        REP(j, 0, m)
+        {
+            VI a = {
+                M[i][j],
+                M[i][m - j - 1],
+                M[n - i - 1][j],
+                M[n - i - 1][m - j - 1]};
+            SORT(a);
+            res += a[3] + a[2] - a[1] - a[0];
+        }
+    }
+    W(res / 4);
 }
-
 signed main()
 {
     sync;
 #ifndef ONLINE_JUDGE
-    auto begin = std::chrono::high_resolution_clock::now();
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
 #endif
-
     int t = 1;
-    //cin >> t;
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
-        //cout << "Case " << testcase << ": ";
         solve();
     }
-
-#ifndef ONLINE_JUDGE
-    auto end = std::chrono::high_resolution_clock::now();
-    cout << setprecision(4) << fixed;
-    cerr << "Execution time: " << std::chrono::duration_cast<std::chrono::duration<double>>(end - begin).count() << " seconds" << endl;
-#endif
     return 0;
 }
