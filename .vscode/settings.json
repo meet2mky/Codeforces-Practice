@@ -5,6 +5,7 @@
         "sstream": "cpp",
         "regex": "cpp",
         "chrono": "cpp",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "*.tcc": "cpp"
     }
 }
