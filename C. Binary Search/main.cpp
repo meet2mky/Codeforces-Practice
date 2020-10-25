@@ -63,7 +63,7 @@ using namespace std;
 #define LINF 0x3f3f3f3f3f3f3f3f
 #define EPS 0.0000001 // eps = 1e-7
 #define PI 3.141592653589793238
-const int MOD = 1000000007;
+const LL MOD = 1000000007;
 template <class T>
 void _R(T &x)
 {
@@ -138,77 +138,221 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-const int N = 1e5 + 10;
-vector<pair<PII, PII>> g[N]; // node,type,cost,enumber
-int dist[N];
-bool vis[N];
-int n, m, k;
-set<int> trains;
-int ans;
-void solve()
+template <typename T>
+T gcd(T a, T b)
 {
-    R(n, m, k);
-    REP(i, 0, m)
+    return a == 0 ? b : gcd(b % a, a);
+}
+template <typename T>
+T mulmod(T a, T b, T m)
+{
+    //assumed a and b in [0...(m-1)];
+    return (a * b) % m;
+}
+template <typename T>
+T addmod(T a, T b, T m)
+{
+    //assumed a and b in [0...(m-1)];
+    return a + b >= m ? a + b - m : a + b;
+}
+template <typename T>
+T submod(T a, T b, T m)
+{
+    //assumed a and b in [0...(m-1)];
+    return a - b < 0 ? a - b + m : a - b;
+}
+template <typename T>
+T powmod(T a, T e, T m)
+{
+    a %= m;
+    if (e == 0)
+        return 1;
+    T ans = a;
+    --e;
+    while (e)
     {
-        int a, b, c;
-        R(a, b, c);
-        g[a].push_back({{b, 0}, {c, i}});
-        g[b].push_back({{a, 0}, {c, i}});
+        if (e & 1)
+            ans = mulmod(a, ans, m);
+        a = mulmod(a, a, m);
+        e >>= 1;
     }
-    REP(i, 0, k)
+    return ans;
+}
+template <typename T>
+T invmod(T a, T m)
+{
+    // assuming m is prime and greater than 2
+    return powmod(a, m - 2, m);
+}
+
+template <typename T>
+vector<T> facarray(T N, T m)
+{
+    vector<T> f_(N + 1, 1);
+    for (T i = 2; i <= N; i++)
+        f_[i] = mulmod(i, f_[i - 1], m);
+    return f_;
+}
+template <typename T>
+vector<T> invarray(T N, T m)
+{
+    vector<T> inv_(N + 1, 1);
+    for (T i = 2; i <= N; i++)
     {
-        int x, c;
-        R(x, c);
-        g[1].push_back({{x, 1}, {c, i + m}});
-        g[x].push_back({{1, 1}, {c, i + m}});
+        inv_[i] = mulmod(m - m / i, inv_[m % i], m);
     }
-    auto comp = [](const pair<PII, PII> &a, const pair<PII, PII> &b) {
-        return a.first > b.first;
-    };
-    priority_queue<pair<PII, PII>, vector<pair<PII, PII>>, decltype(comp)>
-        pq(comp);
-    for (int i = 1; i <= n; i++)
+    return inv_;
+}
+template <typename T>
+vector<T> invfacarray(T N, T m)
+{
+    // assuming m is prime, using fermat's little theorem
+    vector<T> f_ = facarray(N, m);
+    vector<T> invf_(N + 1);
+    invf_[N] = invmod(f_[N], m);
+    for (T i = N - 1; i >= 0; i--)
     {
-        vis[i] = false;
-        dist[i] = LINF;
+        invf_[i] = mulmod(i + 1, invf_[i + 1], m);
     }
-    dist[1] = 0;
-    // {cost,type},{node,en}
-    pq.push({{dist[1], 0}, {1, -1}});
-    while (!pq.empty())
+    return invf_;
+}
+vector<bool> sieve_(int N)
+{
+    vector<bool> p(N + 1, true);
+    p[0] = p[1] = false;
+    for (int i = 2; i * i <= N; i++)
     {
-        int node = pq.top().second.first;
-        int dis = pq.top().first.first;
-        int type = pq.top().first.second;
-        int en = pq.top().second.second;
-        pq.pop();
-        if (vis[node])
+        if (p[i])
         {
-            continue;
-        }
-        vis[node] = true;
-        if (type == 1)
-        {
-            trains.insert(en); // we using this train route
-        }
-        for (auto x : g[node])
-        {
-            // to,type_e,cost_e,e_number
-            int to = x.first.first;
-            int type_e = x.first.second;
-            int dis_e = x.second.first;
-            int num_e = x.second.second;
-            if (dist[to] > dis + dis_e || (dist[to] == dis + dis_e && type_e == 0)) // relax cuz type_e
+            for (int j = i * i; j <= N; j += i)
             {
-                // relax
-                dist[to] = dis + dis_e;
-                // {cost,type},{node,en}
-                pq.push({{dist[to], type_e}, {to, num_e}});
+                p[j] = false;
             }
         }
     }
-    W(k - SZ(trains));
+    return p;
 }
+vector<int> spf_(int N)
+{
+    vector<int> spf(N + 1, 1);
+    for (int i = 1; i <= N; i++)
+        spf[i] = i;
+    for (int i = 2; i * i <= N; i++)
+    {
+        if (spf[i] == i)
+        {
+            for (int j = i * i; j <= N; j += i)
+            {
+                spf[j] = i;
+            }
+        }
+    }
+    return spf;
+}
+vector<int> primelist_(int N)
+{
+    vector<bool> p_ = sieve_(N);
+    vector<int> p;
+    for (int i = 2; i <= N; i++)
+    {
+        if (p_[i])
+        {
+            p.push_back(i);
+        }
+    }
+    return p;
+}
+vector<pair<int, int>> prime_factorization_(int NUM, const vector<int> &spf_)
+{
+    vector<pair<int, int>> res;
+    if (NUM == 1)
+    {
+        return res; // no primes
+    }
+    while (NUM > 1)
+    {
+        int P_here = spf_[NUM];
+        int cnt = 0;
+        while (spf_[NUM] == P_here)
+        {
+            NUM /= P_here;
+            cnt++;
+        }
+        res.push_back({P_here, cnt});
+    }
+    return res;
+}
+int GEneed, Lneed;
+int bs(VI a, int x)
+{
+    int l = 0;
+    int r = SZ(a);
+    while (l < r)
+    {
+        int m = (l + r) / 2;
+        //    W("checks:a[", m, "] <= ", x);
+        if (a[m] <= x)
+        {
+            //  W("TRUE");
+            Lneed++;
+            l = m + 1;
+            if (a[m] == x)
+            {
+                Lneed--;
+            }
+        }
+        else
+        {
+            GEneed++;
+            //    W("FALSE");
+            r = m;
+        }
+    }
+    if (l > 0 && a[l - 1] == x)
+    {
+        return true;
+    }
+    return false;
+}
+void solve()
+{
+    int n, x, pos;
+    R(n, x, pos);
+    vector<int> a(n);
+    for (int i = 1; i <= n; i++)
+    {
+        a[i - 1] = i;
+    }
+    bs(a, a[pos]);
+    //   W("GE: ", GEneed);
+    //  W("L: ", Lneed);
+    int GEavail = n - x;
+    int Lavail = x - 1;
+    if (GEneed > GEavail || Lneed > Lavail)
+    {
+        W(0);
+        return;
+    }
+    vector<int> fac = facarray(1010LL, MOD);
+    vector<int> invfa = invfacarray(1010LL, MOD);
+    int res = 1;
+
+    res = mulmod(res, fac[GEavail], MOD);
+    res = mulmod(res, invfa[GEavail - GEneed], MOD);
+    res = mulmod(res, invfa[GEneed], MOD);
+
+    res = mulmod(res, fac[GEneed], MOD);
+
+    res = mulmod(res, fac[Lavail], MOD);
+    res = mulmod(res, invfa[Lavail - Lneed], MOD);
+    res = mulmod(res, invfa[Lneed], MOD);
+
+    res = mulmod(res, fac[Lneed], MOD);
+
+    res = mulmod(res, fac[n - Lneed - GEneed - 1], MOD);
+    W(res);
+}
+
 signed main()
 {
     sync;
@@ -222,7 +366,7 @@ signed main()
     //cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
-        //cout << "Case " << testcase << ": ";
+        //cout << "Case #" << testcase << ": ";
         solve();
     }
 

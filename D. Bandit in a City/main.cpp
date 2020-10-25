@@ -1,11 +1,3 @@
-/*****************************************************************
-IN GOD WE TRUST !!   
-
-Author:- meet2mky
-Date: -
-Problem:-
-Institue:- NITA
-******************************************************************/
 #include <iostream>
 #include <bitset>
 #include <map>
@@ -63,7 +55,14 @@ using namespace std;
 #define LINF 0x3f3f3f3f3f3f3f3f
 #define EPS 0.0000001 // eps = 1e-7
 #define PI 3.141592653589793238
-const int MOD = 1000000007;
+const LL MOD = 1000000007;
+#ifndef ONLINE_JUDGE
+#define DEBUG(...)      \
+    cout << "[DEBUG] "; \
+    W(__VA_ARGS__);
+#else
+#define DEBUG(...)
+#endif
 template <class T>
 void _R(T &x)
 {
@@ -114,101 +113,100 @@ void W(const T &head, const U &... tail)
     cout << (sizeof...(tail) ? ' ' : '\n');
     W(tail...);
 }
-#ifndef ONLINE_JUDGE
-#define DEBUG(...)      \
-    cout << "[DEBUG] "; \
-    W(__VA_ARGS__);
-#else
-#define DEBUG(...)
-#endif
-
-#define NEEDLONG
-#ifdef NEEDLONG
 #define int long long
-#endif
-/*****************************************************************
-Read the problem carefully!!
-Take inputs carefully
-Care for array index out of bound errors
-Check for overflow
-Divide the problem in several parts if possible
-Keep Calm and believe on yourself.
-Do not panic & work hard you will get it right one day
+const int N = 2e5 + 10;
+struct Node
+{
+    int fr, mx, sz;
+    Node()
+    {
+        fr = 0;
+        mx = 0;
+        sz = 0;
+    }
+    Node(int val)
+    {
+        fr = 0;
+        mx = val;
+        sz = 1;
+    }
+};
+Node combine(Node &a, Node &b)
+{
+    Node t;
+    t.sz = a.sz + b.sz;
+    t.mx = max(a.mx, b.mx);
+    t.fr = t.mx * (t.sz) - (a.sz * a.mx - a.fr + b.sz * b.mx - b.fr);
+    return t;
+}
+Node adds(Node &a, int val)
+{
+    int can = min(val, a.fr);
+    a.fr -= can;
+    val -= can;
+    if (val)
+    {
+        a.mx += val / (a.sz) + (val % a.sz != 0);
+        a.fr = (a.sz - val % a.sz) * (val % a.sz != 0);
+    }
+    return a;
+}
+int n;
+VI g[N];
+VI value(N, 0);
+VI color(N);
+vector<Node> dp(N);
+void dfs(int s, int p = -1)
+{
 
-
-LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
-******************************************************************/
-const int N = 1e5 + 10;
-vector<pair<PII, PII>> g[N]; // node,type,cost,enumber
-int dist[N];
-bool vis[N];
-int n, m, k;
-set<int> trains;
-int ans;
+    int childs = 0;
+    for (auto nx : g[s])
+    {
+        if (nx == p)
+            continue;
+        if (color[nx] == 0)
+        {
+            dfs(nx, s);
+            childs++;
+        }
+    }
+    if (childs == 0)
+    {
+        dp[s] = Node(value[s]);
+    }
+    else
+    {
+        for (auto nx : g[s])
+        {
+            if (nx == p)
+            {
+                continue;
+            }
+            dp[s] = combine(dp[s], dp[nx]);
+        }
+        dp[s] = adds(dp[s], value[s]);
+    }
+    color[s] = 2;
+}
 void solve()
 {
-    R(n, m, k);
-    REP(i, 0, m)
+    R(n);
+    for (int i = 1; i < n; i++)
     {
-        int a, b, c;
-        R(a, b, c);
-        g[a].push_back({{b, 0}, {c, i}});
-        g[b].push_back({{a, 0}, {c, i}});
+        int a;
+        R(a);
+        g[a].push_back(i + 1);
+        g[i + 1].push_back(a);
     }
-    REP(i, 0, k)
+    REP(i, 1, n + 1)
     {
-        int x, c;
-        R(x, c);
-        g[1].push_back({{x, 1}, {c, i + m}});
-        g[x].push_back({{1, 1}, {c, i + m}});
+        R(value[i]);
     }
-    auto comp = [](const pair<PII, PII> &a, const pair<PII, PII> &b) {
-        return a.first > b.first;
-    };
-    priority_queue<pair<PII, PII>, vector<pair<PII, PII>>, decltype(comp)>
-        pq(comp);
-    for (int i = 1; i <= n; i++)
-    {
-        vis[i] = false;
-        dist[i] = LINF;
-    }
-    dist[1] = 0;
-    // {cost,type},{node,en}
-    pq.push({{dist[1], 0}, {1, -1}});
-    while (!pq.empty())
-    {
-        int node = pq.top().second.first;
-        int dis = pq.top().first.first;
-        int type = pq.top().first.second;
-        int en = pq.top().second.second;
-        pq.pop();
-        if (vis[node])
-        {
-            continue;
-        }
-        vis[node] = true;
-        if (type == 1)
-        {
-            trains.insert(en); // we using this train route
-        }
-        for (auto x : g[node])
-        {
-            // to,type_e,cost_e,e_number
-            int to = x.first.first;
-            int type_e = x.first.second;
-            int dis_e = x.second.first;
-            int num_e = x.second.second;
-            if (dist[to] > dis + dis_e || (dist[to] == dis + dis_e && type_e == 0)) // relax cuz type_e
-            {
-                // relax
-                dist[to] = dis + dis_e;
-                // {cost,type},{node,en}
-                pq.push({{dist[to], type_e}, {to, num_e}});
-            }
-        }
-    }
-    W(k - SZ(trains));
+
+    dfs(1);
+    W(dp[1].mx);
 }
+
 signed main()
 {
     sync;
@@ -222,13 +220,13 @@ signed main()
     //cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
-        //cout << "Case " << testcase << ": ";
+        //cout << "Case #" << testcase << ": ";
         solve();
     }
 
 #ifndef ONLINE_JUDGE
     auto end = std::chrono::high_resolution_clock::now();
-    cout << setprecision(4) << fixed;
+    cerr << setprecision(4) << fixed;
     cerr << "Execution time: " << std::chrono::duration_cast<std::chrono::duration<double>>(end - begin).count() << " seconds" << endl;
 #endif
     return 0;

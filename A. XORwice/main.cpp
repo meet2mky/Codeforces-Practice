@@ -63,7 +63,7 @@ using namespace std;
 #define LINF 0x3f3f3f3f3f3f3f3f
 #define EPS 0.0000001 // eps = 1e-7
 #define PI 3.141592653589793238
-const int MOD = 1000000007;
+const LL MOD = 1000000007;
 template <class T>
 void _R(T &x)
 {
@@ -122,7 +122,7 @@ void W(const T &head, const U &... tail)
 #define DEBUG(...)
 #endif
 
-#define NEEDLONG
+//#define NEEDLONG
 #ifdef NEEDLONG
 #define int long long
 #endif
@@ -138,77 +138,15 @@ Do not panic & work hard you will get it right one day
 
 LOOP ITERATORS MIXING ~ WASTE OF TIME AND LOTS OF BUG
 ******************************************************************/
-const int N = 1e5 + 10;
-vector<pair<PII, PII>> g[N]; // node,type,cost,enumber
-int dist[N];
-bool vis[N];
-int n, m, k;
-set<int> trains;
-int ans;
+
 void solve()
 {
-    R(n, m, k);
-    REP(i, 0, m)
-    {
-        int a, b, c;
-        R(a, b, c);
-        g[a].push_back({{b, 0}, {c, i}});
-        g[b].push_back({{a, 0}, {c, i}});
-    }
-    REP(i, 0, k)
-    {
-        int x, c;
-        R(x, c);
-        g[1].push_back({{x, 1}, {c, i + m}});
-        g[x].push_back({{1, 1}, {c, i + m}});
-    }
-    auto comp = [](const pair<PII, PII> &a, const pair<PII, PII> &b) {
-        return a.first > b.first;
-    };
-    priority_queue<pair<PII, PII>, vector<pair<PII, PII>>, decltype(comp)>
-        pq(comp);
-    for (int i = 1; i <= n; i++)
-    {
-        vis[i] = false;
-        dist[i] = LINF;
-    }
-    dist[1] = 0;
-    // {cost,type},{node,en}
-    pq.push({{dist[1], 0}, {1, -1}});
-    while (!pq.empty())
-    {
-        int node = pq.top().second.first;
-        int dis = pq.top().first.first;
-        int type = pq.top().first.second;
-        int en = pq.top().second.second;
-        pq.pop();
-        if (vis[node])
-        {
-            continue;
-        }
-        vis[node] = true;
-        if (type == 1)
-        {
-            trains.insert(en); // we using this train route
-        }
-        for (auto x : g[node])
-        {
-            // to,type_e,cost_e,e_number
-            int to = x.first.first;
-            int type_e = x.first.second;
-            int dis_e = x.second.first;
-            int num_e = x.second.second;
-            if (dist[to] > dis + dis_e || (dist[to] == dis + dis_e && type_e == 0)) // relax cuz type_e
-            {
-                // relax
-                dist[to] = dis + dis_e;
-                // {cost,type},{node,en}
-                pq.push({{dist[to], type_e}, {to, num_e}});
-            }
-        }
-    }
-    W(k - SZ(trains));
+    int a, b;
+    R(a, b);
+    int ooor = (a & b);
+    W((a ^ ooor) + (b ^ ooor));
 }
+
 signed main()
 {
     sync;
@@ -219,7 +157,7 @@ signed main()
 #endif
 
     int t = 1;
-    //cin >> t;
+    cin >> t;
     for (int testcase = 1; testcase <= t; testcase++)
     {
         //cout << "Case " << testcase << ": ";
